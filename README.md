@@ -199,10 +199,74 @@ WBITT Network MultiTool (with NGINX) - hw-3-565c67c86c-f9gj7 - 10.1.77.43 - HTTP
 ### Задание 2. Создать Deployment и обеспечить старт основного контейнера при выполнении условий
 
 1. Создать Deployment приложения nginx и обеспечить старт контейнера только после того, как будет запущен сервис этого приложения.
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-init-deploy
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: nginx-init
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-init
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25.4
+        ports:
+        - containerPort: 80
+      initContainers:
+      - name: delay
+        image: busybox
+        command: ['sh', '-c', "until nslookup nginx-init-svc.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for nginx-init-svc; sleep 2; done"]
+```
+
+```
+user@k8s:/opt/hw_k8s_3$ microk8s kubectl apply -f nginx-init-deploy.yaml
+deployment.apps/nginx-init-deploy created
+```
+
 2. Убедиться, что nginx не стартует. В качестве Init-контейнера взять busybox.
+
+```
+user@k8s:/opt/hw_k8s_3$ microk8s kubectl get pods
+NAME                                 READY   STATUS     RESTARTS   AGE
+hw-3                                 1/1     Running    0          6h33m
+hw-3-565c67c86c-f9gj7                2/2     Running    0          6h22m
+hw-3-565c67c86c-m2548                2/2     Running    0          6h21m
+nginx-init-deploy-77547c5fbc-gf77r   0/1     Init:0/1   0          3m29s
+```
+
 3. Создать и запустить Service. Убедиться, что Init запустился.
+
+```
+user@k8s:/opt/hw_k8s_3$ microk8s kubectl apply -f nginx-init-svc.yaml
+service/nginx-init-svc created
+user@k8s:/opt/hw_k8s_3$ microk8s kubectl get svc
+NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)           AGE
+hw-3-service     ClusterIP   10.152.183.107   <none>        80/TCP,8080/TCP   146m
+kubernetes       ClusterIP   10.152.183.1     <none>        443/TCP           6d2h
+nginx-init-svc   ClusterIP   10.152.183.229   <none>        80/TCP            5s
+```
+
 4. Продемонстрировать состояние пода до и после запуска сервиса.
 
+После запуска сервиса:
+
+```
+user@k8s:/opt/hw_k8s_3$ microk8s kubectl get pods
+NAME                                 READY   STATUS    RESTARTS   AGE
+hw-3                                 1/1     Running   0          6h34m
+hw-3-565c67c86c-f9gj7                2/2     Running   0          6h23m
+hw-3-565c67c86c-m2548                2/2     Running   0          6h23m
+nginx-init-deploy-77547c5fbc-gf77r   1/1     Running   0          5m3s
+```
 ------
 
 ### Правила приема работы
