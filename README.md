@@ -70,6 +70,8 @@ NAME   READY   UP-TO-DATE   AVAILABLE   AGE
 hw-3   1/1     1            1           5m15s
 ```
 
+[task1-deployment.yaml](https://github.com/stepynin-georgy/hw_k8s_3/blob/main/task1-deployment.yaml)
+
 2. После запуска увеличить количество реплик работающего приложения до 2.
 
 ```
@@ -121,6 +123,8 @@ spec:
       targetPort: 1180
 ```
 
+[task1-service.yaml](https://github.com/stepynin-georgy/hw_k8s_3/blob/main/task1-service.yaml)
+
 ```
 user@k8s:/opt/hw_k8s_3$ microk8s kubectl  apply -f task1-service.yaml
 service/hw-3-service created
@@ -146,6 +150,8 @@ spec:
        ports:
         - containerPort: 8080
 ```
+
+[multitool.yaml](https://github.com/stepynin-georgy/hw_k8s_3/blob/main/multitool.yaml)
 
 ```
 user@k8s:/opt/hw_k8s_3$ microk8s kubectl apply -f multitool.yaml
@@ -227,6 +233,8 @@ spec:
         command: ['sh', '-c', "until nslookup nginx-init-svc.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for nginx-init-svc; sleep 2; done"]
 ```
 
+[nginx-init-deploy.yaml](https://github.com/stepynin-georgy/hw_k8s_3/blob/main/nginx-init-deploy.yaml)
+
 ```
 user@k8s:/opt/hw_k8s_3$ microk8s kubectl apply -f nginx-init-deploy.yaml
 deployment.apps/nginx-init-deploy created
@@ -244,6 +252,22 @@ nginx-init-deploy-77547c5fbc-gf77r   0/1     Init:0/1   0          3m29s
 ```
 
 3. Создать и запустить Service. Убедиться, что Init запустился.
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-init-svc
+  namespace: default
+spec:
+  ports:
+    - name: nginx-init
+      port: 80
+  selector:
+    app: nginx-init
+```
+
+[nginx-init-svc.yaml](https://github.com/stepynin-georgy/hw_k8s_3/blob/main/nginx-init-svc.yaml)
 
 ```
 user@k8s:/opt/hw_k8s_3$ microk8s kubectl apply -f nginx-init-svc.yaml
