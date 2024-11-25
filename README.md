@@ -157,6 +157,43 @@ hw-3-55d6c9d747-gmj4k   2/2     Running   0          26m
 multitool               1/1     Running   0          6s
 ```
 
+Проверка:
+
+```
+user@k8s:/opt/hw_k8s_3$ microk8s kubectl exec -n default hw-3 -- curl hw-3-service:80
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   615  100   615    0     0   506k      0 --:--:-- --:--:-- --:--:--  600k
+user@k8s:/opt/hw_k8s_3$ microk8s kubectl exec -n default hw-3 -- curl hw-3-service:8080
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   138  100   138    0     0  15081      0 --:--:-- --:--:-- --:--:-- 15333
+WBITT Network MultiTool (with NGINX) - hw-3-565c67c86c-f9gj7 - 10.1.77.43 - HTTP: 1180 , HTTPS: 443 . (Formerly praqma/network-multitool)
+```
+
 ------
 
 ### Задание 2. Создать Deployment и обеспечить старт основного контейнера при выполнении условий
